@@ -4,15 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Endpoint：终端，作为socket的服务连接端。
  * 有初始化，启动，停止的生命周期
- *
+ * <p>
  * 启动后，启动不同的线程池提供以下服务：
  * Socket acceptor thread
  * Socket poller thread
@@ -31,14 +32,20 @@ public class NioEndpoint {
     private int port = 8089;
     private int soTimeout = 60000;
 
-    /** SelectionKey.OP_ACCEPT */
+    /**
+     * SelectionKey.OP_ACCEPT
+     */
     private int acceptCount = 100;
 
-    /**ExecutorService 与 Executor 之间的区别 */
+    /**
+     * ExecutorService 与 Executor 之间的区别
+     */
     private ExecutorService executor;
     private int maxThreads = 5;
 
-    /** 信号的作用是什么 */
+    /**
+     * 信号的作用是什么
+     */
     private Semaphore connectionLimit;
     private int maxConnections = 2;
 
@@ -49,33 +56,72 @@ public class NioEndpoint {
     /**
      * 初始化Endpoint
      */
-    public void init() {
+    public void init() throws IOException {
+        serverSocket = ServerSocketChannel.open();
+        serverSocket.bind(new InetSocketAddress(port), acceptCount);
+        serverSocket.configureBlocking(true);
+        serverSocket.socket().setSoTimeout(soTimeout);
 
+        connectionLimit = new Semaphore(maxConnections);
     }
 
     /**
      * 启动服务
      */
-    public void start() {
+    public void start() throws IOException{
+        running = true;
+        // 初始化线程池
+        executor = Executors.newFixedThreadPool(maxThreads, new ThreadFactory() {
+            // 为什么这里要用静态的？
+            final AtomicInteger threadNumber = new AtomicInteger(1);
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r, "pool-thread-" + threadNumber);
+                return thread;
+            }
+        });
+        // 启动 Poller 线程
+        poller = new Poller(this);
+        Thread pollerThread = new Thread(poller, "poller");
+        pollerThread.start();
+        // 启动 Acceptor 线程
+        acceptor = new Acceptor(this);
+        Thread acceptorThread = new Thread(acceptor, "acceptor");
+        acceptorThread.start();
 
+        logger.info("容器启动，监听端口：", port);
     }
 
     /**
      * 关闭服务
      */
     public void stop() {
-
+        running = false;
+        poller.destroy();
+        executor.shutdownNow();
     }
 
-    public void acquire() {
-
+    /**
+     * 申请一个连接名额
+     */
+    public void acquire() throws InterruptedException{
+        if (maxConnections == -1) {
+            return;
+        }
+        connectionLimit.acquire();
     }
 
+    /**
+     * 释放一个连接名额
+     */
     public void release() {
-
+        if (maxConnections == -1) {
+            return;
+        }
+        connectionLimit.release();
     }
 
-    public SocketChannel accept() throws IOException{
+    public SocketChannel accept() throws IOException {
         return serverSocket.accept();
     }
 

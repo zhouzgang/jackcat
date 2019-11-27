@@ -84,4 +84,20 @@ public class NioChannel {
         }
         return ret;
     }
+
+    public Poller getPoller() {
+        return poller;
+    }
+
+    public void setPoller(Poller poller) {
+        this.poller = poller;
+    }
+
+    public int getInterestOps() {
+        return interestOps;
+    }
+
+    public void setInterestOps(int interestOps) {
+        this.interestOps = interestOps;
+    }
 }
