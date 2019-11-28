@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.channels.Selector;
+import java.nio.channels.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -42,7 +42,25 @@ public class Poller implements Runnable {
      */
     @Override
     public void run() {
+        int keyCount = 0;
+        while (true) {
+            boolean hasEvens = false;
+            try {
+                if (!close) {
+                    hasEvens = events();
+                    keyCount = selector.select(5000);
+                } else {
+                    timeout();
+                    selector.close();
+                    break;
+                }
+            } catch (IOException e) {
+                logger.error("selector select 异常：{}", e.getMessage());
+                continue;
+            }
 
+
+        }
     }
 
     /**
@@ -65,7 +83,7 @@ public class Poller implements Runnable {
      */
     public void register(NioChannel channel, int interestOps) {
         channel.setPoller(this);
-        channel.setInterestOps(interestOps);
+        channel.interestOps(interestOps);
         events.offer(channel);
         // 唤醒 selector 的作用是什么?
         selector.wakeup();
@@ -76,7 +94,46 @@ public class Poller implements Runnable {
      * @return
      */
     public boolean events() {
-        return false;
+        boolean hasEvents = false;
+        NioChannel channel;
+        while ((channel = events.poll()) != null) {
+            hasEvents = true;
+            SocketChannel sc = channel.ioChannel();
+            int eventOps = channel.interestOps();
+            if (eventOps == Acceptor.OP_REGISTER) {
+                try {
+                    logger.debug("注册新通道 [{}]", channel);
+                    sc.register(selector, SelectionKey.OP_READ, channel);
+                } catch (ClosedChannelException e) {
+                    logger.debug("注册新通道 [{}] 失败，错误信息：{}", channel, e.getMessage());
+                }
+            } else if (eventOps == SelectionKey.OP_READ || eventOps == SelectionKey.OP_WRITE) {
+                // keyFor 函数的作用？
+                SelectionKey key = sc.keyFor(channel.getPoller().getSelector());
+                try {
+                    // 这里在做什么？
+                    if (key != null) {
+                        int ops = key.interestOps() | channel.interestOps();
+                        key.interestOps(ops);
+                        channel.interestOps(ops);
+                    }
+                } catch (CancelledKeyException ckx) {
+                    cancelledKey(key);
+                }
+            }
+        }
+        return hasEvents;
     }
 
+    public void cancelledKey(SelectionKey key) {
+        // attach() 函数的作用？
+        NioChannel socket = (NioChannel) key.attach(null);
+        if (socket != null) {
+endpoint.getHandler()
+        }
+    }
+
+    public Selector getSelector() {
+        return selector;
+    }
 }

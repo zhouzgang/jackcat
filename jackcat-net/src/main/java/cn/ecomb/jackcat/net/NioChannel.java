@@ -93,11 +93,15 @@ public class NioChannel {
         this.poller = poller;
     }
 
-    public int getInterestOps() {
+    public int interestOps() {
         return interestOps;
     }
 
-    public void setInterestOps(int interestOps) {
+    public void interestOps(int interestOps) {
         this.interestOps = interestOps;
+    }
+
+    public SocketChannel ioChannel() {
+        return sChannel;
     }
 }

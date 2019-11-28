@@ -2,17 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2047f079-9eb7-4926-a2e0-f2a2cb1eae04" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat-bootstrap/jackcat-bootstrap.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat-catalina/jackcat-catalina.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat-coyote/jackcat-coyote.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Acceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Handler.java" beforeDir="false" afterPath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Handler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/NioChannel.java" beforeDir="false" afterPath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/NioChannel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/NioEndpoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/NioEndpoint.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Poller.java" beforeDir="false" afterPath="$PROJECT_DIR$/jackcat-net/src/main/java/cn/ecomb/jackcat/net/Poller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jackcat.iml" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -123,7 +116,7 @@
       <workItem from="1573363981094" duration="529000" />
       <workItem from="1574164243459" duration="5162000" />
       <workItem from="1574682235187" duration="3219000" />
-      <workItem from="1574755638645" duration="10395000" />
+      <workItem from="1574755638645" duration="16003000" />
     </task>
     <servers />
   </component>
