@@ -7,11 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="jackcat-net" />
-        <module name="jackcat-utils" />
         <module name="jackcat-catalina" />
+        <module name="jackcat-utils" />
         <module name="jackcat-bootstrap" />
         <module name="jackcat-coyote" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="jackcat-bootstrap" target="1.5" />
+      <module name="jackcat-catalina" target="1.5" />
+      <module name="jackcat-coyote" target="1.5" />
+      <module name="jackcat-utils" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>

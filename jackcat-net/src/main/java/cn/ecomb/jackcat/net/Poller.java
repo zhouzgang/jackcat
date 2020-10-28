@@ -129,7 +129,7 @@ public class Poller implements Runnable {
         // attach() 函数的作用？
         NioChannel socket = (NioChannel) key.attach(null);
         if (socket != null) {
-endpoint.getHandler()
+        //endpoint.getHandler()
         }
     }
 

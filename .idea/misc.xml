@@ -9,7 +9,12 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/jackcat-bootstrap/pom.xml" />
+        <option value="$PROJECT_DIR$/jackcat-catalina/pom.xml" />
+        <option value="$PROJECT_DIR$/jackcat-coyote/pom.xml" />
+        <option value="$PROJECT_DIR$/jackcat-test/pom.xml" />
         <option value="$PROJECT_DIR$/jackcat-unit/pom.xml" />
+        <option value="$PROJECT_DIR$/jackcat-utils/pom.xml" />
       </set>
     </option>
   </component>
