@@ -20,7 +20,7 @@ public abstract class Lifecycle {
 	public abstract void stop();
 
 	/** 观察者模式，事件通知列表 */
-	private List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<>();
+	private List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<LifecycleListener>();
 
 	/**
 	 * 添加事件监听者

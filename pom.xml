@@ -14,6 +14,7 @@
         <module>jackcat-coyote</module>
         <module>jackcat-catalina</module>
         <module>jackcat-utils</module>
+        <module>jackcat-http</module>
     </modules>
 
     <properties>

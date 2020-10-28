@@ -18,10 +18,13 @@ public abstract class Container extends Lifecycle{
 	protected Container parent;
 
 	/** 子容器 */
-	protected HashMap<String, Container> children = new HashMap<>();
+	protected HashMap<String, Container> children = new HashMap<String, Container>();
 
 	/** 管道 */
 	protected Pipeline pipeline = new Pipeline(this);
 
+	@Override
+	public void start() {
 
+	}
 }
