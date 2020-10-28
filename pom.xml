@@ -16,12 +16,35 @@
         <module>jackcat-utils</module>
     </modules>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <logback.version>1.2.3</logback.version>
+        <junit.version>4.12</junit.version>
+        <servlet.version>2.5</servlet.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <version>${logback.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.servlet</groupId>-->
+<!--            <artifactId>servlet-api</artifactId>-->
+<!--            <version>${servlet.version}</version>-->
+<!--        </dependency>-->
     </dependencies>
+
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            <dependency>-->
+<!--                <groupId>javax.servlet</groupId>-->
+<!--                <artifactId>servlet-api</artifactId>-->
+<!--                <version>${servlet.version}</version>-->
+<!--            </dependency>-->
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
 
 </project>
