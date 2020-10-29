@@ -18,7 +18,7 @@ public class NioChannel {
 
     private Logger logger = LoggerFactory.getLogger(NioChannel.class);
 
-    private SocketChannel sChannel;
+    private SocketChannel socketChannel;
     private ByteBuffer readBuff;
     private ByteBuffer writeBuff;
 
@@ -32,7 +32,7 @@ public class NioChannel {
     private CountDownLatch readLatch;
 
     public NioChannel(SocketChannel socket) {
-        this.sChannel = socket;
+        this.socketChannel = socket;
         readBuff = ByteBuffer.allocate(2 * 8192);
         writeBuff = ByteBuffer.allocate(2 * 8192);
         lastAccess = System.currentTimeMillis();
@@ -52,7 +52,7 @@ public class NioChannel {
         if (block) {
 
         } else {
-            n = sChannel.read(readBuff);
+            n = socketChannel.read(readBuff);
             logger.debug("从通道 [{}] 非阻塞读取 [{}] 字节", this, n);
         }
         return n;
@@ -66,20 +66,27 @@ public class NioChannel {
 
     }
 
+    public CountDownLatch getWritLatch() {
+        return writLatch;
+    }
+
+    public CountDownLatch getReadLatch() {
+        return readLatch;
+    }
 
     public int read(ByteBuffer dst) throws IOException {
-        return sChannel.read(dst);
+        return socketChannel.read(dst);
     }
 
     public int write(ByteBuffer src) throws IOException {
-        return sChannel.write(src);
+        return socketChannel.write(src);
     }
 
     @Override
     public String toString() {
         String ret = null;
         try {
-            ret = sChannel.getRemoteAddress().toString();
+            ret = socketChannel.getRemoteAddress().toString();
         } catch (IOException e) {
             ret = super.toString();
         }
@@ -102,7 +109,7 @@ public class NioChannel {
         this.interestOps = interestOps;
     }
 
-    public SocketChannel ioChannel() {
-        return sChannel;
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
     }
 }

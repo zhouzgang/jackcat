@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -33,7 +32,7 @@ public class Acceptor implements Runnable {
         while (endpoint.isRunning()) {
             try {
                 // 申请一个连接名额
-                endpoint.acquire();
+                endpoint.acquireConnSemaphore();
                 SocketChannel socket = endpoint.accept();
                 try {
                     socket.configureBlocking(false);
@@ -45,7 +44,7 @@ public class Acceptor implements Runnable {
                 } catch (Throwable t) {
                     logger.error("", t);
                     try {
-                        endpoint.release();
+                        endpoint.releaseConnSemaphore();
                         socket.socket().close();
                         socket.close();
                     } catch (IOException e) {

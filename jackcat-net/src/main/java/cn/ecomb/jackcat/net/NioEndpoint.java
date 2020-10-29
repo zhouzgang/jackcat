@@ -39,7 +39,7 @@ public class NioEndpoint {
     private ExecutorService executor;
     private int maxThreads = 5;
 
-    /** 信号的作用是什么，注册 Channel 的安全保证 */
+    /** 信号量的作用是什么，注册 Channel 的安全保证 */
     private Semaphore connectionLimit;
     private int maxConnections = 2;
 
@@ -66,7 +66,7 @@ public class NioEndpoint {
         running = true;
         // 初始化线程池
         executor = Executors.newFixedThreadPool(maxThreads, new ThreadFactory() {
-            // 为什么这里要用静态的？
+            // 为什么这里要用final的？
             final AtomicInteger threadNumber = new AtomicInteger(1);
             @Override
             public Thread newThread(Runnable r) {
@@ -98,7 +98,7 @@ public class NioEndpoint {
     /**
      * 申请一个连接名额
      */
-    public void acquire() throws InterruptedException{
+    public void acquireConnSemaphore() throws InterruptedException{
         if (maxConnections == -1) {
             return;
         }
@@ -108,7 +108,7 @@ public class NioEndpoint {
     /**
      * 释放一个连接名额
      */
-    public void release() {
+    public void releaseConnSemaphore() {
         if (maxConnections == -1) {
             return;
         }
@@ -171,5 +171,9 @@ public class NioEndpoint {
     public NioEndpoint setHandler(Handler handler) {
         this.handler = handler;
         return this;
+    }
+
+    public ExecutorService getExecutor() {
+        return executor;
     }
 }

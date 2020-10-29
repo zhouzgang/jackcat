@@ -10,3 +10,8 @@
 事件驱动方式也被称为消息通知方式，其实是设计模式中观察者模式的思路。
 
 ### Endpoint 中的使用
+
+
+### 疑问
+- ServerSocketChannel 与 Selector 之间的关系
+- Selector 的机制是什么
