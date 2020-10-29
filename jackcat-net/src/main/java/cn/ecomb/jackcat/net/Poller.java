@@ -36,7 +36,7 @@ public class Poller implements Runnable {
     }
 
     /**
-     * 循环检查是否有事件
+     * 循环检查是否有事件是否可读
      * 获取Channel
      * 处理超时问题
      */
@@ -85,7 +85,7 @@ public class Poller implements Runnable {
         channel.setPoller(this);
         channel.interestOps(interestOps);
         events.offer(channel);
-        // 唤醒 selector 的作用是什么?
+        // 使尚未返回的第一个选择操作立即返回。
         selector.wakeup();
     }
 

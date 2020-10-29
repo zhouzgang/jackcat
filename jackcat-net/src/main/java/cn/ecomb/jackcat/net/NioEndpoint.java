@@ -32,20 +32,14 @@ public class NioEndpoint {
     private int port = 8089;
     private int soTimeout = 60000;
 
-    /**
-     * SelectionKey.OP_ACCEPT
-     */
+    /** SelectionKey.OP_ACCEPT */
     private int acceptCount = 100;
 
-    /**
-     * ExecutorService 与 Executor 之间的区别
-     */
+    /** ExecutorService 与 Executor 之间的区别 */
     private ExecutorService executor;
     private int maxThreads = 5;
 
-    /**
-     * 信号的作用是什么
-     */
+    /** 信号的作用是什么，注册 Channel 的安全保证 */
     private Semaphore connectionLimit;
     private int maxConnections = 2;
 

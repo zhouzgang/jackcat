@@ -9,7 +9,8 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * 封装 SocketChannel
+ * 封装 SocketChannel，实现对 Socket 流的读写和刷新。
+ *
  * @author zhouzg
  * @date 2019-10-13.
  */
