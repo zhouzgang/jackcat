@@ -13,4 +13,11 @@
     <artifactId>jackcat-http</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.ecomb.jackcat</groupId>
+            <artifactId>jackcat-net</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

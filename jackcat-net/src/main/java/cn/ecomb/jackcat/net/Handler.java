@@ -3,6 +3,7 @@ package cn.ecomb.jackcat.net;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.channels.SelectionKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,11 +44,37 @@ public abstract class Handler {
      * @return
      */
     public SocketState handle(NioChannel channel) {
-        /*
-        创建请求
-        处理请求
-         */
-        return SocketState.LONG;
+
+        Processor processor = connections.get(channel);
+        if (processor == null) {
+            processor = createProcessor();
+            connections.put(channel, processor);
+            logger.debug("为通道 {} 创建处理器 {}", channel, processor);
+        }
+
+        SocketState state = processor.process(channel);
+        switch (state) {
+            case OPEN:
+                logger.debug("保持连接，通道 {} 重新声明读取事件", channel);
+                connections.remove(channel);
+                channel.getPoller().register(channel, SelectionKey.OP_READ);
+                break;
+            case LONG:
+                logger.debug("请求数据没准备好，通道 {} 重新注册读取事件", channel);
+                channel.getPoller().register(channel, SelectionKey.OP_READ);
+                break;
+            case WRITE:
+                logger.debug("写数据，通道 {} 注册写入事件", channel);
+                channel.getPoller().register(channel, SelectionKey.OP_WRITE);
+                break;
+            case CLOSED:
+                connections.remove(channel);
+                break;
+            default:
+                connections.remove(channel);
+        }
+
+        return state;
     }
 
     /**

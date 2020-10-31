@@ -11,7 +11,10 @@ public interface Processor {
 
     /**
      * 处理请求
+     * 这里使用了什么方式，以至于，只返回了状态，而没有返回处理后的结果，这是一种可以总结学习的地方
+     *
      * @param channel 请求通道
+     * @return 通道处理后的状态
      */
-    void process(NioChannel channel);
+    Handler.SocketState process(NioChannel channel);
 }

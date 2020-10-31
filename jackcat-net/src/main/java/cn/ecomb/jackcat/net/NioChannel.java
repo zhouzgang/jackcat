@@ -3,8 +3,10 @@ package cn.ecomb.jackcat.net;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.CountDownLatch;
 
@@ -25,7 +27,7 @@ public class NioChannel {
     private Poller poller;
     private int interestOps = 0;
 
-    private long timeOut = 100000;
+    private long timeOut = 10000;
     private long lastAccessTime = -1;
 
     private CountDownLatch writLatch;
@@ -50,6 +52,7 @@ public class NioChannel {
         int n = 0;
         block = false;
         if (block) {
+            logger.debug("模拟阻塞从 {} 读取", this);
 
         } else {
             n = socketChannel.read(readBuff);
@@ -61,8 +64,36 @@ public class NioChannel {
     /**
      * 阻塞把响应体数据发送到客户端，重置缓冲区，以便再次写入
      */
-    public void flush() {
+    public void flush() throws IOException {
         writeBuff.flip();
+        // todo 这里应该还没写完
+        if (writeBuff.remaining() > 0) {
+            logger.debug("模拟阻塞写数据");
+        }
+        while (writeBuff.hasRemaining()) {
+            int n = socketChannel.write(writeBuff);
+            if (n == -1) {
+                throw new EOFException();
+            }
+            if (n > 0) {
+                logger.debug("阻塞写入 {}B 字节", n);
+                continue;
+            }
+
+            // todo what is here?
+            writLatch = new CountDownLatch(1);
+            // todo why do this
+            poller.register(this, SelectionKey.OP_WRITE);
+            logger.debug("等待阻塞通道 {} 写数据", this);
+            try {
+                writLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            writLatch = null;
+        }
+        writeBuff.clear();
+
 
     }
 
