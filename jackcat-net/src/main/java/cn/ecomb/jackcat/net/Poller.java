@@ -51,7 +51,7 @@ public class Poller implements Runnable {
                     hasEvents = hasEvents();
                     keyCount = selector.select(5000);
                 } else {
-                    timeout();
+                    timeout(0, false);
                     selector.close();
                     break;
                 }
@@ -69,6 +69,7 @@ public class Poller implements Runnable {
                 for (SelectionKey key : selector.selectedKeys()) {
                     final NioChannel channel = (NioChannel) key.attachment();
                     if (channel != null && (key.isReadable() || key.isWritable())) {
+                        channel.setLastAccessTime();
                         logger.debug("通道 {} 发生 {} IO 事件，从关注事件中移除已就绪的事件",
                                 channel, key.isReadable() ? "读" : "写");
 
@@ -106,7 +107,7 @@ public class Poller implements Runnable {
             }
 
             // todo 为什么这里还要做超时处理
-            timeout();
+            timeout(keyCount, hasEvents);
         }
     }
 
@@ -114,8 +115,30 @@ public class Poller implements Runnable {
      * 处理超时
      * todo 这里应该不叫 timeout
      */
-    public void timeout() {
+    public void timeout(int keyCount, boolean hasEvents) {
+        long now = System.currentTimeMillis();
+        if (nextExpiration > 0 && (keyCount > 0 || hasEvents) && now < nextExpiration && !close) {
+            return;
+        }
 
+        for (SelectionKey key : selector.selectedKeys()) {
+            NioChannel channel = (NioChannel) key.attachment();
+            if (channel == null) {
+                cancelledKey(key);
+            } else if ((channel.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ
+                    || (channel.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                long delta = now - channel.getLastAccessTime();
+                boolean isTimeOut = delta > endpoint.getSoTimeout();
+                if (isTimeOut) {
+                    logger.debug("通道 {} 读写超时", channel);
+                    key.interestOps(0);
+                    channel.interestOps(0);
+                    cancelledKey(key);
+                }
+            }
+        }
+        // 设置下次检查时间 todo 这个时间在逻辑上好像有问题
+        nextExpiration = System.currentTimeMillis() + 1000;
     }
 
     /**

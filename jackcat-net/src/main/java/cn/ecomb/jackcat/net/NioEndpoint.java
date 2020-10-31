@@ -30,6 +30,7 @@ public class NioEndpoint {
 
     private ServerSocketChannel serverSocket;
     private int port = 8089;
+    /** 超时时间 */
     private int soTimeout = 60000;
 
     /** SelectionKey.OP_ACCEPT */

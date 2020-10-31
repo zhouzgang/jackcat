@@ -26,7 +26,7 @@ public class NioChannel {
     private int interestOps = 0;
 
     private long timeOut = 100000;
-    private long lastAccess = -1;
+    private long lastAccessTime = -1;
 
     private CountDownLatch writLatch;
     private CountDownLatch readLatch;
@@ -35,7 +35,7 @@ public class NioChannel {
         this.socketChannel = socket;
         readBuff = ByteBuffer.allocate(2 * 8192);
         writeBuff = ByteBuffer.allocate(2 * 8192);
-        lastAccess = System.currentTimeMillis();
+        lastAccessTime = System.currentTimeMillis();
     }
 
     /**
@@ -111,5 +111,13 @@ public class NioChannel {
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
+    }
+
+    public long getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    public void setLastAccessTime() {
+        this.lastAccessTime = System.currentTimeMillis();
     }
 }

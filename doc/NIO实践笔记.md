@@ -9,6 +9,11 @@
 事件驱动方式，发生事件，主线程把事件放入事件队列，在另外线程不断循环消费事件列表中的事件，调用事件对应的处理逻辑处理事件。
 事件驱动方式也被称为消息通知方式，其实是设计模式中观察者模式的思路。
 
+### Selector 原理
+(Selector 原理)[https://www.jianshu.com/p/2b71ea919d49]
+(NIO编码)[https://www.cnblogs.com/yeyang/p/12578701.html]
+还是不太明白，这里的关系。
+
 ### Endpoint 中的使用
 
 
