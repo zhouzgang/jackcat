@@ -33,9 +33,18 @@ public class HttpProcessor implements Processor, ActionHook{
 	private boolean keepAlive = true;
 	private boolean error = false;
 
+	/** 一个长连接最多处理多少个请求，-1 表示不限制 */
+	private int maxkeepAliveRequests = -1;
+
 	public HttpProcessor() {
 		request = new JackRequest();
-		inBuffer = new InputBuffer();
+		inBuffer = new InputBuffer(request);
+		request.setActionHook(this);
+
+		response = new JackResponse();
+		outBuffer = new OutputBuffer(response);
+		response.setActionHook(this);
+		maxkeepAliveRequests = 10;
 	}
 
 	@Override

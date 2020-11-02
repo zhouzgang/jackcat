@@ -24,6 +24,9 @@ public class OutputBuffer implements Recyclable {
 	private NioChannel channel;
 	private JackResponse response;
 
+	public OutputBuffer(JackResponse response) {
+		this.response = response;
+	}
 
 	@Override
 	public void recycle() {

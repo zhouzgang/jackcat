@@ -151,4 +151,12 @@ public class NioChannel {
     public void setLastAccessTime() {
         this.lastAccessTime = System.currentTimeMillis();
     }
+
+    public ByteBuffer getReadBuff() {
+        return readBuff;
+    }
+
+    public ByteBuffer getWriteBuff() {
+        return writeBuff;
+    }
 }
