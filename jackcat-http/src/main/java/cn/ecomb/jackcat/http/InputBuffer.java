@@ -9,6 +9,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static cn.ecomb.jackcat.http.HttpTag.*;
+
 /**
  * 输入缓存区
  *
@@ -19,6 +21,7 @@ import java.nio.ByteBuffer;
 public class InputBuffer implements Recyclable, BufferHoler{
 
 	private static final Logger logger = LoggerFactory.getLogger(InputBuffer.class);
+	private byte chr;
 
 	/** 数据解析状态 */
 	public enum ParseStatus {
@@ -52,6 +55,7 @@ public class InputBuffer implements Recyclable, BufferHoler{
 		this.request = request;
 	}
 
+	// sb 里面的内容是如何设置进去的？
 	private String takeString() {
 		String ret = sb.toString();
 		sb.setLength(0);
@@ -73,26 +77,89 @@ public class InputBuffer implements Recyclable, BufferHoler{
 		logger.debug("解析请求头和情趣行");
 		// 这里的处理方式很有意思，通过状态流转的方式，循环读取，并解析
 		// 这里是不是可以一次性循环读取完，再解析会好一点？
+		String headerName = null;
 		do {
 			if (byteBuffer.position() >= byteBuffer.limit() && !fill(false)) {
 				return false;
 			}
 
-			byte chr = byteBuffer.get();
+			// 这里get做了什么事情
+			chr = byteBuffer.get();
 			switch (parseStatus) {
 				case METHOD:
+					if (chr == SP) {
+						request.setMethod(takeString());
+						sb.setLength(0);
+						parseStatus = ParseStatus.URI;
+					} else {
+						sb.append((char) chr);
+					}
 					break;
 				case URI:
+					if (chr == SP || chr == QUESTION) {
+						request.setUri(takeString());
+						sb.setLength(0);
+						if (chr == QUESTION) {
+							request.setQueryBufferOps(byteBuffer.position());
+							parseStatus = ParseStatus.QUERY;
+						} else {
+							parseStatus = ParseStatus.VERSION;
+						}
+					} else {
+						sb.append((char) chr);
+					}
 					break;
 				case QUERY:
+					if (chr == SP) {
+						int queryEndPos = byteBuffer.position();
+						ByteBuffer temp = byteBuffer.duplicate();
+						temp.position(request.getQueryBufferOps()).limit(queryEndPos);
+						request.setQueryBuffer(temp.duplicate());
+						request.getQueryBuffer().mark();
+
+						parseStatus = ParseStatus.VERSION;
+					}
 					break;
 				case VERSION:
+					if (chr == CR) {
+
+					} else if (chr == LF) {
+						request.setProtocol(takeString());
+						parseStatus = ParseStatus.HEAD_NAME;
+					} else {
+						sb.append((char) chr);
+					}
 					break;
 				case HEAD_NAME:
+					if (chr == COLON) {
+						headerName = takeString().toLowerCase();
+						parseStatus = ParseStatus.HEAD_VALUE;
+					} else {
+						sb.append((char) chr);
+					}
 					break;
 				case HEAD_VALUE:
+					if (chr == CR) {
+
+					} else if (chr == LF) {
+						request.addHeader(headerName, takeString().trim().toLowerCase());
+						headerName = null;
+						parseStatus = ParseStatus.HEAD_END;
+					} else {
+						sb.append((char) chr);
+					}
 					break;
 				case HEAD_END:
+					if (chr == CR) {
+
+					} else if (chr == LF) {
+						parseStatus = ParseStatus.DONE;
+						parsingHeader = false;
+						rHead = byteBuffer.position();
+					} else {
+						sb.append((char) chr);
+						parseStatus = ParseStatus.HEAD_NAME;
+					}
 					break;
 				default:
 					break;
@@ -100,6 +167,7 @@ public class InputBuffer implements Recyclable, BufferHoler{
 
 		} while (parseStatus != ParseStatus.DONE);
 
+		logger.debug("请求头部数据读取并解析完毕\r\n======Request======\r\n{}\r\n===================", request);
 
 		return true;
 	}
@@ -131,21 +199,39 @@ public class InputBuffer implements Recyclable, BufferHoler{
 
 
 	/**
-	 * 读取请求体
+	 * 模拟阻塞读取请求体
+	 *
 	 * @param holer
 	 * @return
 	 */
-	public int readBody(BufferHoler holer) {
-		return 0;
+	public int readBody(BufferHoler holer) throws IOException {
+		if (bodyCodec != null) {
+			return bodyCodec.doRead(this, holer);
+		} else {
+			return readBodyBytes(holer);
+		}
 	}
 
 	/**
-	 * 读取请求体
+	 * 读取请求体，从底层通道读取数据，并返回一个与结果对应的视图
+	 * 这里的作用是什么？
+	 *
 	 * @param holer
 	 * @return
 	 */
-	public int readBodyBytes(BufferHoler holer) {
-		return 0;
+	public int readBodyBytes(BufferHoler holer) throws IOException {
+		if (byteBuffer.position() >= byteBuffer.limit()) {
+			if (!fill(true)) {
+				holer.setByteBuffer(null);
+				return -1;
+			}
+		}
+		int length = byteBuffer.remaining();
+		if (byteBuffer != null) {
+			holer.setByteBuffer(byteBuffer.duplicate());
+		}
+		byteBuffer.position(byteBuffer.limit());
+		return length;
 	}
 
 

@@ -23,8 +23,8 @@ public class JackRequest implements Recyclable, ActionHook{
 	private String method;
 	private String uri;
 
-	private ByteBuffer dataBuffer;
-	private int dataBufferOps = -1;
+	private ByteBuffer queryBuffer;
+	private int queryBufferOps = -1;
 
 	private String contentType;
 	private int contentLength = -1;
@@ -59,10 +59,10 @@ public class JackRequest implements Recyclable, ActionHook{
 		params.clear();
 		headers.clear();
 		attributes.clear();
-		dataBufferOps = -1;
-		if (dataBuffer != null) {
-			dataBuffer.clear();
-			dataBuffer = null;
+		queryBufferOps = -1;
+		if (queryBuffer != null) {
+			queryBuffer.clear();
+			queryBuffer = null;
 		}
 
 	}
@@ -122,9 +122,9 @@ public class JackRequest implements Recyclable, ActionHook{
 		builder.append("Request headers: \r\n");
 		builder.append(method).append(" ");
 		builder.append(uri);
-		if (dataBuffer != null) {
-			dataBuffer.reset();
-			builder.append(new String(dataBuffer.array(),0, dataBuffer.remaining()));
+		if (queryBuffer != null) {
+			queryBuffer.reset();
+			builder.append(new String(queryBuffer.array(),0, queryBuffer.remaining()));
 		}
 		builder.append(" ").append(protocol).append("\r\n");
 		for (Map.Entry<String, String> header : headers.entrySet()) {
