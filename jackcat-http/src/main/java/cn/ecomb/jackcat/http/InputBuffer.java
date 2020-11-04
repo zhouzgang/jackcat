@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 
 import static cn.ecomb.jackcat.http.HttpTag.*;
@@ -18,17 +20,21 @@ import static cn.ecomb.jackcat.http.HttpTag.*;
  * @date 2020-11-01.
  */
 @Data
-public class InputBuffer implements Recyclable, BufferHoler{
+public class InputBuffer implements Recyclable, BufferHoler {
 
 	private static final Logger logger = LoggerFactory.getLogger(InputBuffer.class);
 	private byte chr;
 
-	/** 数据解析状态 */
+	/**
+	 * 数据解析状态
+	 */
 	public enum ParseStatus {
 		METHOD, URI, VERSION, QUERY, HEAD_NAME, HEAD_VALUE, HEAD_END, DONE
 	}
 
-	/** 当前解析的状态 */
+	/**
+	 * 当前解析的状态
+	 */
 	private ParseStatus parseStatus;
 
 	private boolean parsingHeader = true;
@@ -37,17 +43,25 @@ public class InputBuffer implements Recyclable, BufferHoler{
 	private NioChannel channel;
 	private JackRequest request;
 	private BodyCodec bodyCodec;
-	/** 应用 Channel 内部的 readByteBuffer */
+	/**
+	 * 应用 Channel 内部的 readByteBuffer
+	 */
 	private ByteBuffer byteBuffer;
 
-	/** 请求体开始的位置 */
+	/**
+	 * 请求体开始的位置
+	 */
 	private int bodyOps;
-	/** 最大的 post 大小 */
+	/**
+	 * 最大的 post 大小
+	 */
 	private int maxPostSize = 1 * 1024 * 1024;
 	private ByteBuffer body = ByteBuffer.allocate(maxPostSize);
 	private ByteBuffer bodyView = null;
 
-	/** 请求头信息在字节数组中结束的位置，即请求体开始位置 */
+	/**
+	 * 请求头信息在字节数组中结束的位置，即请求体开始位置
+	 */
 	private int rHead;
 	private StringBuffer sb = new StringBuffer();
 
@@ -69,7 +83,8 @@ public class InputBuffer implements Recyclable, BufferHoler{
 	}
 
 	/**
-	 *  解析请求行和请求头
+	 * 解析请求行和请求头
+	 *
 	 * @return
 	 */
 	public boolean parseRequestLineAndHeads() throws IOException {
@@ -175,6 +190,7 @@ public class InputBuffer implements Recyclable, BufferHoler{
 	/**
 	 * 从 socket 通道里读取字节
 	 * todo 原版的这里设计的很乱，调用来调用去的，思路一点的不清晰，或者说代码写的不通俗易懂。
+	 *
 	 * @param block
 	 */
 	public boolean fill(boolean block) throws IOException {
@@ -239,16 +255,76 @@ public class InputBuffer implements Recyclable, BufferHoler{
 	 * 解析 GET 和 POST 请求参数
 	 */
 	public void readAndParseBody() {
+		request.setParamParsed(true);
+		// parse GET params
+		if (request.getQueryBuffer() != null) {
+			request.getQueryBuffer().reset();
+			byte[] queryBytes = new byte[request.getQueryBuffer().remaining()];
+			request.getQueryBuffer().get(queryBytes);
+			parseParam(queryBytes);
+		}
+
+		if (!"POST".contentEquals(request.getMethod()) ||
+				!request.getContentType().contains("application/x-www-form-urlencoded")) {
+			return;
+		}
+
+		body.clear();
+		try {
+			int len = request.getContentLength();
+			if (len > 0) {
+				if (len > maxPostSize) {
+					request.setParamParseFail(true);
+					return;
+				}
+
+				int n = -1;
+				while (len > 0 && (n = readBody(this)) >= 0) {
+					body.put(bodyView);
+					len -= n;
+				}
+			} else if ("chunked".equalsIgnoreCase(request.getHeader("transfer-encoding"))) {
+				len = 0;
+				int n = 0;
+				while ((n = readBody(this)) >= 0) {
+					body.put(bodyView);
+					len += n;
+					if (len > maxPostSize) {
+						request.setParamParseFail(true);
+						return;
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 
 	/**
-	 * 解析请求参数
+	 * 解析请求 URL 上的参数 a=%99
+	 *
 	 * @param body
 	 */
 	private void parseParam(byte[] body) {
+		String paramStr = new String(body, request.getEncoding());
+		try {
+			paramStr = URLDecoder.decode(paramStr, request.getEncoding().toString());
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 
+		String[] params = paramStr.split("&");
+		if (params != null && params.length > 0) {
+			for (String param : params) {
+				if (param.startsWith("=")) {
+					continue;
+				}
+				String[] nv = param.trim().split("=");
+				request.getParams().put(nv[0], nv.length > 1 ? nv[1] : "");
+			}
+		}
 	}
 
 	public void setRequest(JackRequest request) {

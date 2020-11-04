@@ -29,6 +29,10 @@ public enum HttpStatus {
 		return code;
 	}
 
+	public String getMsg() {
+		return msg;
+	}
+
 	public static HttpStatus getByCode(int code) {
 		for (HttpStatus status : HttpStatus.values()) {
 			if (status.getCode() == code) {

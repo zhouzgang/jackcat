@@ -2,6 +2,7 @@ package cn.ecomb.jackcat.http;
 
 import lombok.Data;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 /**
@@ -36,8 +37,37 @@ public class JackResponse implements Recyclable, ActionHook{
 		}
 	}
 
+	/**
+	 * 写入响应体数据
+	 * @param byteBuffer
+	 */
+	public void doWrite(ByteBuffer byteBuffer) {
+		action(ActionCode.WRITE_BODY, byteBuffer);
+	}
+
+	public void addHeader(String name, String value) {
+		headers.put(name, value);
+	}
+
+	public String getHeader(String name) {
+		return headers.get(name);
+	}
+
+	public String getContentType() {
+		String ret = contentType;
+		if (ret != null && characterEncoding != null) {
+			ret = ret + ";charset=" + characterEncoding;
+		}
+		return ret;
+	}
+
 	@Override
 	public void recycle() {
-
+		committed = false;
+		contentType = null;
+		contentLength = -1;
+		headers.clear();
+		status = 200;
+		message = "";
 	}
 }
