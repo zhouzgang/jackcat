@@ -1,5 +1,6 @@
 package cn.ecomb.jackcat.http;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -20,7 +21,7 @@ public interface BodyCodec {
 	 * @param holer 请求体数据
 	 * @return 读取状态 -1 表示请求读取完毕，>=0 表示读到数据
 	 */
-	int doRead(InputBuffer inputBuffer, BufferHoler holer);
+	int doRead(InputBuffer inputBuffer, BufferHoler holer) throws IOException;
 
 	/**
 	 * 如果服务端准备发送异常响应，但是请求体还有数据未读（比如当上传一个过大的文件时，服务端
@@ -29,7 +30,7 @@ public interface BodyCodec {
 	 *
 	 * @param inputBuffer 关联的http请求解析类
 	 */
-	void endRead(InputBuffer inputBuffer);
+	void endRead(InputBuffer inputBuffer) throws IOException;
 
 	/**
 	 * 将响应体写到缓存区
@@ -37,7 +38,7 @@ public interface BodyCodec {
 	 * @param outputBuffer 关联的响应编码处理类
 	 * @param src 需要写入的数据
 	 */
-	void doWrite(OutputBuffer outputBuffer, ByteBuffer src);
+	void doWrite(OutputBuffer outputBuffer, ByteBuffer src) throws IOException;
 
 	void endWrite(OutputBuffer outputBuffer);
 

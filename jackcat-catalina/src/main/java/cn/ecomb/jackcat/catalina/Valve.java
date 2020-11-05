@@ -1,7 +1,7 @@
 package cn.ecomb.jackcat.catalina;
 
-import cn.ecomb.jackcat.catalina.session.Request;
-import cn.ecomb.jackcat.catalina.session.Response;
+import cn.ecomb.jackcat.catalina.servletx.Request;
+import cn.ecomb.jackcat.catalina.servletx.Response;
 
 /**
  * 阀门抽象类，每个实现类都有机会处理请求，判断是否继续走下去

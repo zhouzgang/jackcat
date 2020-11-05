@@ -80,7 +80,7 @@ public class OutputBuffer implements Recyclable {
 	 * 写入响应体数据
 	 * 写之前需要确认，响应头数据已写入
 	 */
-	public void writeBody(ByteBuffer body) {
+	public void writeBody(ByteBuffer body) throws IOException {
 		if (!response.isCommitted()) {
 			response.action(ActionHook.ActionCode.COMMIT, null);
 		}

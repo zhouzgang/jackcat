@@ -1,7 +1,7 @@
 package cn.ecomb.jackcat.catalina;
 
-import cn.ecomb.jackcat.catalina.session.Request;
-import cn.ecomb.jackcat.catalina.session.Response;
+import cn.ecomb.jackcat.catalina.servletx.Request;
+import cn.ecomb.jackcat.catalina.servletx.Response;
 
 /**
  * 管道，配合阀门形成有固定为节点的阀门链

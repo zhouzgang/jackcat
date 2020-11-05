@@ -177,4 +177,9 @@ public class NioEndpoint {
     public ExecutorService getExecutor() {
         return executor;
     }
+
+    public NioEndpoint setPort(int port) {
+        this.port = port;
+        return this;
+    }
 }
