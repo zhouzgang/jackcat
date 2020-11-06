@@ -335,7 +335,7 @@ public class InputBuffer implements Recyclable, BufferHoler {
 		this.bodyCodec = codec;
 	}
 
-	public void end() {
+	public void end() throws IOException {
 		if (bodyCodec != null) {
 			bodyCodec.endRead(this);
 		}

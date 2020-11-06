@@ -61,6 +61,7 @@ public class HttpProcessor implements Processor, ActionHook{
 		outBuffer.setChannel(channel);
 		int keepAliveLeft = maxkeepAliveRequests;
 
+		// 这是一种什么写法
 		while (!error && keepAlive) {
 			try {
 				if (inBuffer.parseRequestLineAndHeads()) {
@@ -82,7 +83,13 @@ public class HttpProcessor implements Processor, ActionHook{
 				adapter.service(request, response);
 			}
 
-			inBuffer.end();
+			try {
+				inBuffer.end();
+			} catch (IOException e) {
+				logger.error("错误的饿完成请求结果:{}", e.getMessage());
+				error = true;
+				response.setStatus(500);
+			}
 			try {
 				outBuffer.end();
 			} catch (IOException e) {
@@ -132,7 +139,7 @@ public class HttpProcessor implements Processor, ActionHook{
 				request.remove("content-length");
 				request.setContentLength(-1);
 			} else {
-				inBuffer.setBodyCodec(new IdentityCodec());
+				inBuffer.setBodyCodec(new IdentityCodec(contentLength));
 				contentDelimitation = true;
 			}
 		}
@@ -218,7 +225,7 @@ public class HttpProcessor implements Processor, ActionHook{
 			int contentLength = response.getContentLength();
 			if (contentLength != -1) {
 				response.addHeader("Conent-Length", String.valueOf(contentLength));
-				outBuffer.setBodyCodec(new IdentityCodec());
+				outBuffer.setBodyCodec(new IdentityCodec(contentLength));
 			} else {
 				response.addHeader("Transfer-Encoding", "chunked");
 				outBuffer.setBodyCodec(new ChunkedCodec());

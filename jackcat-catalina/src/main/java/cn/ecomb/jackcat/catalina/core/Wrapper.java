@@ -17,4 +17,14 @@ public class Wrapper extends Container {
     public void stop() {
 
     }
+
+    @Override
+    public void startInternal() {
+
+    }
+
+    @Override
+    public void backgroundProcess() {
+
+    }
 }

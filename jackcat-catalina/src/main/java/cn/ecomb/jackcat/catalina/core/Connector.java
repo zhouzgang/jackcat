@@ -18,7 +18,7 @@ public class Connector {
 
     private Context context;
 
-    private int prot = 8088;
+    private int port = 8088;
 
     /** 端点 */
     private NioEndpoint endpoint;
@@ -48,12 +48,12 @@ public class Connector {
         endpoint.stop();
     }
 
-    public int getProt() {
-        return prot;
+    public int getPort() {
+        return port;
     }
 
-    public Connector setProt(int port) {
-        this.prot = port;
+    public Connector setPort(int port) {
+        this.port = port;
         endpoint.setPort(port);
         return this;
     }
