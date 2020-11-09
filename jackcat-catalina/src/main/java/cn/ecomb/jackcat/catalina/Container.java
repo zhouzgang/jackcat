@@ -33,14 +33,18 @@ public abstract class Container extends Lifecycle{
 	 * 启动本容器的后台线程
 	 */
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		fireLifecycleEvent(LifecycleEventType.START);
 
 		startInternal();
 
 		children.values().forEach(container -> {
 			if (container != null) {
-				container.start();
+				try {
+					container.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -56,7 +60,7 @@ public abstract class Container extends Lifecycle{
 	/**
 	 * 初始化容器内部操作
 	 */
-	public abstract void startInternal();
+	public abstract void startInternal() throws Exception;
 
 	/**
 	 * 后台业务处理线程
@@ -87,5 +91,13 @@ public abstract class Container extends Lifecycle{
 
 	public Container findChildren(String name) {
 		return children.get(name);
+	}
+
+	public void addValve(Valve valve) {
+		pipeline.addValve(valve);
+	}
+
+	public Pipeline getPipeline() {
+		return pipeline;
 	}
 }

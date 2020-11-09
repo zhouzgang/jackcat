@@ -1,5 +1,6 @@
 package cn.ecomb.jackcat.catalina;
 
+import java.io.IOException;
 import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,7 +16,7 @@ public abstract class Lifecycle {
 	/** 初始化 */
 	public abstract void init();
 	/** 启动 */
-	public abstract void start();
+	public abstract void start() throws IOException, Exception;
 	/** 停止 */
 	public abstract void stop();
 
