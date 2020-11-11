@@ -1,6 +1,11 @@
 package cn.ecomb.jackcat.catalina.servletx;
 
+import cn.ecomb.jackcat.catalina.core.Context;
+import cn.ecomb.jackcat.catalina.core.Wrapper;
+import cn.ecomb.jackcat.http.JackRequest;
 import cn.ecomb.jackcat.http.Recyclable;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
@@ -21,7 +26,17 @@ import java.util.Map;
  * @author brian.zhou
  * @date 2020/10/28
  */
+@Data
+@Slf4j
 public class Request implements HttpServletRequest, Recyclable {
+
+	private Response response;
+
+	private Context context;
+	private Wrapper wrapper;
+
+	private JackRequest jackRequest;
+
 
 	@Override
 	public void recycle() {

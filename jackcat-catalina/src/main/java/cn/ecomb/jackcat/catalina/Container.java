@@ -1,5 +1,7 @@
 package cn.ecomb.jackcat.catalina;
 
+import lombok.Data;
+
 import java.util.HashMap;
 
 /**
@@ -9,6 +11,7 @@ import java.util.HashMap;
  * @author brian.zhou
  * @date 2020/10/28
  */
+@Data
 public abstract class Container extends Lifecycle{
 
 	/** 容器名字 */
@@ -84,6 +87,21 @@ public abstract class Container extends Lifecycle{
 	 * 容器业务处理
 	 */
 	public abstract void backgroundProcess();
+
+	/**
+	 * 添加子容器
+	 *
+	 * @param child
+	 */
+	public void addChild(Container child) {
+		child.setParent(this);
+		try {
+			child.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		children.put(child.getName(), child);
+	}
 
 	public String getName() {
 		return name;

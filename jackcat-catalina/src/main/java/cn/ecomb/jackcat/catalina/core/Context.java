@@ -2,12 +2,16 @@ package cn.ecomb.jackcat.catalina.core;
 
 import cn.ecomb.jackcat.catalina.Container;
 import cn.ecomb.jackcat.catalina.Loader;
+import cn.ecomb.jackcat.catalina.servletx.AppContext;
 import cn.ecomb.jackcat.catalina.servletx.FilterWrapper;
 import cn.ecomb.jackcat.catalina.session.Manager;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 应用程序在内部的表现类，包含 web.xml 配置的参数、Servlet 和 Filter
@@ -15,9 +19,14 @@ import java.util.HashMap;
  * @author zhouzg
  * @date 2020-10-29.
  */
+@Data
 public class Context extends Container {
 
     private final Logger log = LoggerFactory.getLogger(Context.class);
+
+    /** 应用的名称 */
+    private String docBase;
+    private String docBasePath;
 
     public static final String APP_WEB_XML = "WEB-INF/web.xml";
     public static final String RESOURCES_ATTR = "app.resources";
@@ -25,12 +34,38 @@ public class Context extends Container {
     private Connector connector;
     /** 默认 servlet */
     private Wrapper defaultWrapper;
+    private AppContext appContext;
     private WebResource resource;
+
+    /**
+     * 容器类加载器
+     */
+    private ClassLoader parentClassLoader = Context.class.getClassLoader();
     private Manager manager;
     private Loader loader;
 
     private HashMap<String, FilterWrapper> filters = new HashMap<>();
     private HashMap<String, String> mimeMappings = new HashMap<>();
+
+    /**
+     * context-param 配置参数
+     * todo 这里需要线程安全
+     */
+    private final ConcurrentHashMap<String, String> params = new ConcurrentHashMap<>();
+
+    /**
+     * 精确匹配 URL，比如 /user
+     */
+    private TreeMap<String, Wrapper> exactWrappers = new TreeMap<>();
+    /**
+     * 扩展名匹配，比如 '*.' 为前缀的 URL，*.action。存储 key 为 action
+     */
+    private TreeMap<String, Wrapper> extensionWrappers = new TreeMap<>();
+    /**
+     * 模糊匹配，'/*' 结尾的 URL，'/user/*',存储 key 为 /user
+     */
+    private TreeMap<String, Wrapper> wildcardWrappers = new TreeMap<>();
+
 
 
     public Context() {
@@ -41,6 +76,10 @@ public class Context extends Container {
     @Override
     public void init() {
         defaultWrapper = new Wrapper();
+        defaultWrapper.setName("default");
+        // 设置默认的 servlet
+        defaultWrapper.setServletClass("");
+        addChild(defaultWrapper);
 
         resource = new WebResource();
 
@@ -71,7 +110,7 @@ public class Context extends Container {
         // 管理 session
         manager = new Manager();
         // 初始化 web 应用 jar 的加载器
-        loader = new Loader();
+        loader = new Loader(parentClassLoader, this);
         // 初始化并启动连接器
         connector = new Connector();
         connector.setContext(this);
@@ -89,6 +128,12 @@ public class Context extends Container {
 
     @Override
     public void backgroundProcess() {
+        if (loader != null) {
+            loader.backgroundProcess();
+        }
 
+        if (manager != null) {
+            manager.backgroundProcess();
+        }
     }
 }

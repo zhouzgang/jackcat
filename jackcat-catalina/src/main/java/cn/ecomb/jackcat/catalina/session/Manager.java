@@ -5,4 +5,8 @@ package cn.ecomb.jackcat.catalina.session;
  * @date 2020-11-06.
  */
 public class Manager {
+
+	public void backgroundProcess() {
+
+	}
 }
