@@ -1,19 +1,25 @@
 package cn.ecomb.jackcat.catalina.core;
 
 import cn.ecomb.jackcat.catalina.Lifecycle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.ecomb.jackcat.utils.digester.Digester;
+import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * @author brian.zhou
  * @date 2020/11/9
  */
+@Slf4j
 public class ContextConfig implements Lifecycle.LifecycleListener {
 
-	private Logger logger = LoggerFactory.getLogger(ContextConfig.class);
+	private Context context;
+	private boolean deployed = false;
+
+	private Digester webXmlParser;
 
 	@Override
 	public void lifecycleEvent(Lifecycle.LifecycleEvent lifecycleEvent) {
+		context = (Context) lifecycleEvent.getSource();
 		switch (lifecycleEvent.getType()) {
 			case INIT:
 				init();
@@ -30,6 +36,8 @@ public class ContextConfig implements Lifecycle.LifecycleListener {
 	}
 
 	private void init() {
+		webXmlParser = new Digester();
+
 
 	}
 

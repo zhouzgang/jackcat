@@ -4,6 +4,7 @@ import cn.ecomb.jackcat.catalina.servletx.Request;
 import cn.ecomb.jackcat.catalina.servletx.Response;
 
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 /**
  * 阀门抽象类，每个实现类都有机会处理请求，判断是否继续走下去
@@ -38,5 +39,5 @@ public abstract class Valve {
 	 * @param request   请求对象
 	 * @param response  返回对象
 	 */
-	public abstract void invoke(Request request, Response response) throws ServletException;
+	public abstract void invoke(Request request, Response response) throws ServletException, IOException;
 }

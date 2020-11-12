@@ -9,6 +9,9 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +30,9 @@ public class Context extends Container {
     /** 应用的名称 */
     private String docBase;
     private String docBasePath;
+
+    private String appBase = "webapp";
+    private String welcomeBase = "index.xml";
 
     public static final String APP_WEB_XML = "WEB-INF/web.xml";
     public static final String RESOURCES_ATTR = "app.resources";
@@ -135,5 +141,24 @@ public class Context extends Container {
         if (manager != null) {
             manager.backgroundProcess();
         }
+    }
+
+    /**
+     * 获取文件真实绝对路径
+     *
+     * @param path 相对路径
+     * @return
+     */
+    public String getRealPath(String path) {
+        File file = new File(getDocBasePath(), path);
+        return file.getAbsolutePath();
+    }
+
+    public String getDocBasePath() {
+        if (docBasePath == null) {
+            Path base = Paths.get(System.getProperty("jackcat.base"), appBase, docBase);
+            docBasePath = base.toAbsolutePath().toString();
+        }
+        return docBasePath;
     }
 }
