@@ -2,6 +2,7 @@ package cn.ecomb.jackcat.catalina.servletx;
 
 import cn.ecomb.jackcat.catalina.core.Context;
 import cn.ecomb.jackcat.catalina.core.Wrapper;
+import cn.ecomb.jackcat.catalina.session.Session;
 import cn.ecomb.jackcat.http.JackRequest;
 import cn.ecomb.jackcat.http.Recyclable;
 import lombok.Data;
@@ -37,10 +38,20 @@ public class Request implements HttpServletRequest, Recyclable {
 
 	private JackRequest jackRequest;
 
+	private Session session;
+	private String sessionId;
+
+	protected Cookie[] cookies;
 
 	@Override
 	public void recycle() {
-
+		context = null;
+		wrapper = null;
+		cookies = null;
+		if (session != null) {
+			session.endAccess();
+		}
+		session = null;
 	}
 
 	@Override
@@ -50,7 +61,22 @@ public class Request implements HttpServletRequest, Recyclable {
 
 	@Override
 	public Cookie[] getCookies() {
-		return new Cookie[0];
+		if (cookies == null) {
+			String cookieStr = jackRequest.getHeader("cookie");
+			if (cookieStr != null) {
+				String[] cookiesArray = cookieStr.split(";");
+				if (cookiesArray.length > 0) {
+					return new Cookie[0];
+				}
+
+				cookies = new Cookie[cookiesArray.length];
+				for (int i = 0; i < cookiesArray.length; i++) {
+					String[] cookieTemp = cookiesArray[i].split("=");
+					cookies[i] = new Cookie(cookieTemp[0], cookieTemp[1]);
+				}
+			}
+		}
+		return cookies;
 	}
 
 	@Override

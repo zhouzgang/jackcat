@@ -24,6 +24,8 @@ public class Wrapper extends Container implements ServletConfig {
     private volatile Servlet servlet;
     private String servletClass;
 
+    private String wrapperPath;
+
     public Wrapper() {
         pipeline.setBasic(new WrapperBasicValve());
     }

@@ -3,6 +3,9 @@ package cn.ecomb.jackcat.catalina;
 import cn.ecomb.jackcat.catalina.servletx.Request;
 import cn.ecomb.jackcat.catalina.servletx.Response;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
+
 /**
  * 管道，配合阀门形成有固定为节点的阀门链
  *
@@ -26,7 +29,7 @@ public class Pipeline {
 	 * @param request   请求对象
 	 * @param response  返回对象
 	 */
-	public void handle(Request request, Response response) {
+	public void handle(Request request, Response response) throws ServletException, IOException {
 		if (first != null) {
 			first.invoke(request, response);
 		} else {

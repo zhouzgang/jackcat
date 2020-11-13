@@ -5,4 +5,9 @@ package cn.ecomb.jackcat.catalina.session;
  * @date 2020-11-06.
  */
 public class Session {
+
+
+	public void endAccess() {
+
+	}
 }

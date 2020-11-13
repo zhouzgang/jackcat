@@ -1,5 +1,7 @@
 package cn.ecomb.jackcat.catalina.servletx;
 
+import cn.ecomb.jackcat.catalina.core.Context;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
@@ -8,7 +10,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zhouzg
@@ -16,11 +20,17 @@ import java.util.Set;
  */
 public class AppContext implements ServletContext {
 
+	private Context context;
 
+	protected Map<String, Object> attributes = new ConcurrentHashMap<>();
+
+	public AppContext(Context context) {
+		this.context = context;
+	}
 
 	@Override
 	public String getContextPath() {
-		return null;
+		return context.getDocBasePath();
 	}
 
 	@Override
@@ -40,7 +50,16 @@ public class AppContext implements ServletContext {
 
 	@Override
 	public String getMimeType(String file) {
-		return null;
+		if (file == null || "".equals(file)) {
+			return null;
+		}
+		int period = file.lastIndexOf(".");
+		if (period < 0)
+			return null;
+		String extension = file.substring(period + 1);
+		if (extension.length() < 1)
+			return null;
+		return (context.findMineMapping(extension));
 	}
 
 	@Override
@@ -110,7 +129,7 @@ public class AppContext implements ServletContext {
 
 	@Override
 	public String getInitParameter(String name) {
-		return null;
+		return context.getParams().get(name);
 	}
 
 	@Override
@@ -120,7 +139,7 @@ public class AppContext implements ServletContext {
 
 	@Override
 	public Object getAttribute(String name) {
-		return null;
+		return attributes.get(name);
 	}
 
 	@Override
@@ -130,16 +149,16 @@ public class AppContext implements ServletContext {
 
 	@Override
 	public void setAttribute(String name, Object object) {
-
+		attributes.put(name, object);
 	}
 
 	@Override
 	public void removeAttribute(String name) {
-
+		attributes.remove(name);
 	}
 
 	@Override
 	public String getServletContextName() {
-		return null;
+		return context.getDocBase();
 	}
 }

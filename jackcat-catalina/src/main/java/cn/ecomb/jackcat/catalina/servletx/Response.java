@@ -1,6 +1,8 @@
 package cn.ecomb.jackcat.catalina.servletx;
 
+import cn.ecomb.jackcat.http.JackResponse;
 import cn.ecomb.jackcat.http.Recyclable;
+import lombok.Data;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -14,7 +16,19 @@ import java.util.Locale;
  * @author brian.zhou
  * @date 2020/10/28
  */
+@Data
 public class Response implements HttpServletResponse, Recyclable {
+
+	private JackResponse jackResponse;
+	private Request request;
+
+	private AppOutputBuffer outputBuffer;
+	private PrintWriter printWriter;
+
+	public void finish() throws IOException {
+		outputBuffer.close();
+	}
+
 	@Override
 	public void recycle() {
 

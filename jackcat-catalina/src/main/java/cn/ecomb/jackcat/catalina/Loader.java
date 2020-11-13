@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 加载服务 jar 包
@@ -22,6 +24,8 @@ public class Loader extends URLClassLoader {
 
 	private String classesPath;
 	private String libraryPath;
+
+	protected final Map<String, ResourceEntry> resources = new ConcurrentHashMap<>();
 
 
 	public Loader(ClassLoader parent, Context context) throws IOException {
@@ -55,5 +59,25 @@ public class Loader extends URLClassLoader {
 
 	public void backgroundProcess() {
 
+	}
+
+	public void stop() {
+		resources.clear();
+	}
+
+	public static class ResourceEntry {
+		/**
+		 * 0 从其他资源加载
+		 * 1 从 WEB-INF/classes 加载的资源
+		 */
+		public int type = 0;
+		/** 最后一次修改，用于热加载 */
+		public long lastModified;
+		// todo 为什么这里要加 volatile
+		public volatile Class<?> loadClass = null;
+
+		public URL source = null;
+
+		public byte[] binaryContent = null;
 	}
 }

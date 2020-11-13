@@ -79,8 +79,13 @@ public class HttpProcessor implements Processor, ActionHook{
 			}
 
 			if (!error) {
-				logger.debug("提交给容器处理，并生成响应结果");
-				adapter.service(request, response);
+				try {
+					logger.debug("提交给容器处理，并生成响应结果");
+					adapter.service(request, response);
+				} catch (IOException e) {
+					error = true;
+					e.printStackTrace();
+				}
 			}
 
 			try {

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -27,12 +28,15 @@ public class Context extends Container {
 
     private final Logger log = LoggerFactory.getLogger(Context.class);
 
+    /** 正在热部署 */
+    private volatile boolean paused = false;
+
     /** 应用的名称 */
     private String docBase;
     private String docBasePath;
 
     private String appBase = "webapp";
-    private String welcomeBase = "index.xml";
+    private String welcomeFile = "index.xml";
 
     public static final String APP_WEB_XML = "WEB-INF/web.xml";
     public static final String RESOURCES_ATTR = "app.resources";
@@ -143,6 +147,23 @@ public class Context extends Container {
         }
     }
 
+    public void reload() throws IOException {
+        setPaused(true);
+
+        children.values().forEach(container -> {
+            ((Wrapper)container).stop();
+        });
+
+        filters.values().forEach(filterWrapper -> {
+            filterWrapper.release();
+        });
+
+        loader.stop();
+        loader = new Loader(parentClassLoader, this);
+
+        setPaused(false);
+    }
+
     /**
      * 获取文件真实绝对路径
      *
@@ -160,5 +181,9 @@ public class Context extends Container {
             docBasePath = base.toAbsolutePath().toString();
         }
         return docBasePath;
+    }
+
+    public String findMineMapping(String extension) {
+        return mimeMappings.get(extension);
     }
 }

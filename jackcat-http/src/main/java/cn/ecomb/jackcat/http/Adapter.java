@@ -1,5 +1,7 @@
 package cn.ecomb.jackcat.http;
 
+import java.io.IOException;
+
 /**
  * 容器适配器，连接 Endpoint 和 Container
  *
@@ -11,8 +13,8 @@ public interface Adapter {
     /**
      * 处理请求，响应结果
      *
-     * @param request 请求封装
-     * @param response 响应结果
+     * @param jackRequest 请求封装
+     * @param jackResponse 响应结果
      */
-    void service(JackRequest request, JackResponse response);
+    void service(JackRequest jackRequest, JackResponse jackResponse) throws IOException;
 }
