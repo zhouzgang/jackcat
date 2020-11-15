@@ -34,7 +34,7 @@ public interface ActionHook {
 		/** 将返回数据发送给客户端 */
 		FLUSH,
 		/** 响应处理完毕 */
-		close
+		CLOSE
 	}
 
 }

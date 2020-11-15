@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 实现责任链模式
+ *
  * @author zhouzg
  * @date 2020-11-06.
  */

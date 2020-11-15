@@ -124,7 +124,7 @@ public class HttpProcessor implements Processor, ActionHook{
 		}
 
 		String conn = request.getHeader("connection");
-		if (conn == null || "close".equals(conn)) {
+		if (conn == null || "CLOSE".equals(conn)) {
 			keepAlive = false;
 		} else if ("keep-alive".equals(conn)) {
 			keepAlive = true;
@@ -169,7 +169,7 @@ public class HttpProcessor implements Processor, ActionHook{
 					}
 				}
 				break;
-			case close:
+			case CLOSE:
 				action(ActionCode.COMMIT);
 				try {
 					outBuffer.end();

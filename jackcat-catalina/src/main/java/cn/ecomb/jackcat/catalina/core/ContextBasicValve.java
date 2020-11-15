@@ -4,6 +4,7 @@ import cn.ecomb.jackcat.catalina.Valve;
 import cn.ecomb.jackcat.catalina.servletx.Request;
 import cn.ecomb.jackcat.catalina.servletx.Response;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
  */
 public class ContextBasicValve extends Valve {
 	@Override
-	public void invoke(Request request, Response response) throws IOException {
+	public void invoke(Request request, Response response) throws IOException, ServletException {
 		String requestUri = request.getRequestURI();
 		if (requestUri.startsWith("/META-INF/", 0)
 				|| requestUri.equalsIgnoreCase("/META-INF")

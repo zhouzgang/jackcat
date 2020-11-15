@@ -25,8 +25,37 @@ public class Response implements HttpServletResponse, Recyclable {
 	private AppOutputBuffer outputBuffer;
 	private PrintWriter printWriter;
 
+	private boolean error = false;
+	private boolean usingOutputStream = false;
+	private boolean usingWriter = false;
+
 	public void finish() throws IOException {
 		outputBuffer.close();
+	}
+
+
+	public void setSuspended(boolean suspended) {
+		outputBuffer.setSuspended(suspended);
+	}
+
+	public int getStatus() {
+		return jackResponse.getStatus();
+	}
+
+	public String getMessage() {
+		return jackResponse.getMessage();
+	}
+
+	public PrintWriter getReporter() {
+		if (outputBuffer.isNew()) {
+			if (printWriter == null) {
+				printWriter = new PrintWriter(new RespWriter(outputBuffer));
+			}
+			return printWriter;
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override
@@ -66,12 +95,21 @@ public class Response implements HttpServletResponse, Recyclable {
 
 	@Override
 	public void sendError(int sc, String msg) throws IOException {
+		if (isCommitted()) {
+			throw new IllegalStateException("Cannot call sendError() after the response has been committed");
+		}
 
+		setStatus(sc);
+		error = true;
+		jackResponse.setStatus(sc);
+		jackResponse.setMessage(msg);
+		outputBuffer.recycle();
+		setSuspended(true);
 	}
 
 	@Override
 	public void sendError(int sc) throws IOException {
-
+		sendError(sc, null);
 	}
 
 	@Override
@@ -136,7 +174,14 @@ public class Response implements HttpServletResponse, Recyclable {
 
 	@Override
 	public PrintWriter getWriter() throws IOException {
-		return null;
+		if (usingOutputStream) {
+			throw new IllegalStateException("getOutputStream() has already been called for this response");
+		}
+		usingWriter = true;
+		if (printWriter == null) {
+			printWriter = new PrintWriter(new RespWriter(outputBuffer));
+		}
+		return printWriter;
 	}
 
 	@Override
