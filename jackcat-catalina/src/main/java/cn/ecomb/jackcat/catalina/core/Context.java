@@ -8,6 +8,7 @@ import cn.ecomb.jackcat.catalina.session.Manager;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,15 +84,64 @@ public class Context extends Container {
         addLifecycleListener(new ContextConfig());
     }
 
+    public void addFilterWrapper(FilterWrapper filter) {
+        filter.setContext(this);
+        filters.put(filter.getFilterName(), filter);
+    }
+
+    /**
+     * 从 web.xml 提取 filter-mapping
+     */
+    public void addFilterMapping(String filterName, String urlPattern) {
+        FilterWrapper filterWrapper = filters.get(filterName);
+        if (filterWrapper == null) {
+            throw new IllegalArgumentException("unknown filter name");
+        }
+        filterWrapper.addUrlPattern(urlPattern);
+    }
+
+    public void addParam(String name, String value) {
+        if (name == null || value == null) {
+            throw new IllegalArgumentException ("Both parameter name and parameter value are required");
+        }
+
+        String oldValue = params.putIfAbsent(name, value);
+        if (oldValue != null) {
+            throw new IllegalArgumentException("Duplicate context initialization parameter: " + name);
+        }
+    }
+
+    public void addServletMapping(String servletName, String urlPattern) {
+        Wrapper servletWrapper = (Wrapper) findChildren(servletName);
+        if (servletWrapper == null) {
+            throw new IllegalArgumentException("unknown servlet name");
+        }
+
+        String key;
+        if (urlPattern.endsWith("/*")) {
+            key = urlPattern.substring(0, urlPattern.length() - 2);
+            wildcardWrappers.put(key, servletWrapper);
+        } else if (urlPattern.startsWith("*.")) {
+            key = urlPattern.substring(2);
+            extensionWrappers.put(key, servletWrapper);
+        } else if (urlPattern.equals("/")) {
+            defaultWrapper = servletWrapper;
+        } else {
+            key = urlPattern;
+            exactWrappers.put(key, servletWrapper);
+        }
+    }
+
+
     @Override
-    public void init() {
+    public void init() throws IOException, SAXException {
         defaultWrapper = new Wrapper();
         defaultWrapper.setName("default");
         // 设置默认的 servlet
         defaultWrapper.setServletClass("");
         addChild(defaultWrapper);
 
-        resource = new WebResource();
+        resource = new WebResource(this);
 
 
         mimeMappings.put("css","text/css");
@@ -186,4 +236,6 @@ public class Context extends Container {
     public String findMineMapping(String extension) {
         return mimeMappings.get(extension);
     }
+
+
 }

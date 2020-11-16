@@ -1,10 +1,8 @@
 package cn.ecomb.jackcat.catalina.core;
 
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.*;
-import java.net.CacheResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

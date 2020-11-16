@@ -1,5 +1,7 @@
 package cn.ecomb.jackcat.catalina;
 
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.util.EventObject;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class Lifecycle {
 
 	/** 初始化 */
-	public abstract void init();
+	public abstract void init() throws IOException, SAXException;
 	/** 启动 */
 	public abstract void start() throws IOException, Exception;
 	/** 停止 */
@@ -39,7 +41,7 @@ public abstract class Lifecycle {
 		lifecycleListeners.remove(listener);
 	}
 
-	public void fireLifecycleEvent(LifecycleEventType type) {
+	public void fireLifecycleEvent(LifecycleEventType type) throws IOException, SAXException {
 		fireLifecycleEvent(type, null);
 	}
 
@@ -48,7 +50,7 @@ public abstract class Lifecycle {
 	 * @param type  事件类型
 	 * @param data  数据
 	 */
-	public void fireLifecycleEvent(LifecycleEventType type, Object data) {
+	public void fireLifecycleEvent(LifecycleEventType type, Object data) throws IOException, SAXException {
 		LifecycleEvent event = new LifecycleEvent(this, type, data);
 		for (LifecycleListener listener : lifecycleListeners) {
 			listener.lifecycleEvent(event);
@@ -56,7 +58,7 @@ public abstract class Lifecycle {
 	}
 
 	public interface LifecycleListener {
-		void lifecycleEvent(LifecycleEvent lifecycleEvent);
+		void lifecycleEvent(LifecycleEvent lifecycleEvent) throws IOException, SAXException;
 	}
 
 	/**

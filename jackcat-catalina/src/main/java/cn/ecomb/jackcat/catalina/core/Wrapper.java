@@ -94,7 +94,7 @@ public class Wrapper extends Container implements ServletConfig {
 
     @Override
     public ServletContext getServletContext() {
-        return null;
+        return ((Context)getParent()).getAppContext();
     }
 
     @Override

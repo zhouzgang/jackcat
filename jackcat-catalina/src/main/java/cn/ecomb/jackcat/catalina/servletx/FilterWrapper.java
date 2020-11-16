@@ -52,14 +52,22 @@ public class FilterWrapper implements FilterConfig {
 		return this;
 	}
 
+	public boolean isMatchAllUrlPatterns() {
+		return matchAllUrlPatterns;
+	}
+
+	public List<String> getUrlPatterns() {
+		return urlPatterns;
+	}
+
 	@Override
 	public String getFilterName() {
-		return null;
+		return filterName;
 	}
 
 	@Override
 	public ServletContext getServletContext() {
-		return null;
+		return context.getAppContext();
 	}
 
 	@Override

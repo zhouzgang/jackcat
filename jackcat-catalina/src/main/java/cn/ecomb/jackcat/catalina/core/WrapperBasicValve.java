@@ -33,7 +33,7 @@ public class WrapperBasicValve extends Valve {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 
-		AppFilterChain filterChain = AppFilterChain.createFilterChain();
+		AppFilterChain filterChain = AppFilterChain.createFilterChain(request, wrapper, servlet);
 
 		if (servlet != null && filterChain != null) {
 			try {
