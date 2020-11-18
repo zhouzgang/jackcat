@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
  * @author zhouzg
  * @date 2020-11-01.
  */
-public interface BufferHoler {
+public interface BufferHolder {
 
 	void setByteBuffer(ByteBuffer byteBuffer);
 

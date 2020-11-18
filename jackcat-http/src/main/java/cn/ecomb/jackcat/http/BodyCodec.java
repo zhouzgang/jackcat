@@ -21,7 +21,7 @@ public interface BodyCodec {
 	 * @param holer 请求体数据
 	 * @return 读取状态 -1 表示请求读取完毕，>=0 表示读到数据
 	 */
-	int doRead(InputBuffer inputBuffer, BufferHoler holer) throws IOException;
+	int doRead(InputBuffer inputBuffer, BufferHolder holer) throws IOException;
 
 	/**
 	 * 如果服务端准备发送异常响应，但是请求体还有数据未读（比如当上传一个过大的文件时，服务端
@@ -40,7 +40,7 @@ public interface BodyCodec {
 	 */
 	void doWrite(OutputBuffer outputBuffer, ByteBuffer src) throws IOException;
 
-	void endWrite(OutputBuffer outputBuffer);
+	void endWrite(OutputBuffer outputBuffer) throws IOException;
 
 
 }

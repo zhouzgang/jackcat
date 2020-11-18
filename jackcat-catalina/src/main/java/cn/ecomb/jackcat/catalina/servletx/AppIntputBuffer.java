@@ -1,7 +1,7 @@
 package cn.ecomb.jackcat.catalina.servletx;
 
 import cn.ecomb.jackcat.http.ActionHook;
-import cn.ecomb.jackcat.http.BufferHoler;
+import cn.ecomb.jackcat.http.BufferHolder;
 import cn.ecomb.jackcat.http.JackRequest;
 
 import javax.servlet.ServletInputStream;
@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * @author zhouzg
  * @date 2020-11-06.
  */
-public class AppIntputBuffer extends ServletInputStream implements BufferHoler {
+public class AppIntputBuffer extends ServletInputStream implements BufferHolder {
 
 	private JackRequest jackRequest;
 	private ByteBuffer bodyView;

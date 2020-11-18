@@ -1,7 +1,7 @@
 package cn.ecomb.jackcat.http.codecs;
 
 import cn.ecomb.jackcat.http.BodyCodec;
-import cn.ecomb.jackcat.http.BufferHoler;
+import cn.ecomb.jackcat.http.BufferHolder;
 import cn.ecomb.jackcat.http.InputBuffer;
 import cn.ecomb.jackcat.http.OutputBuffer;
 
@@ -23,7 +23,7 @@ public class IdentityCodec implements BodyCodec {
 	}
 
 	@Override
-	public int doRead(InputBuffer inputBuffer, BufferHoler holer) throws IOException {
+	public int doRead(InputBuffer inputBuffer, BufferHolder holer) throws IOException {
 		int result = -1;
 		if (contentLength > 0 && remaining > 0) {
 			int n = inputBuffer.readBodyBytes(holer);

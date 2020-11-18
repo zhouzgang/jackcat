@@ -20,7 +20,7 @@ import static cn.ecomb.jackcat.http.HttpTag.*;
  * @date 2020-11-01.
  */
 @Data
-public class InputBuffer implements Recyclable, BufferHoler {
+public class InputBuffer implements Recyclable, BufferHolder {
 
 	private static final Logger logger = LoggerFactory.getLogger(InputBuffer.class);
 	private byte chr;
@@ -220,12 +220,30 @@ public class InputBuffer implements Recyclable, BufferHoler {
 	 * @param holer
 	 * @return
 	 */
-	public int readBody(BufferHoler holer) throws IOException {
+	public int readBody(BufferHolder holer) throws IOException {
 		if (bodyCodec != null) {
 			return bodyCodec.doRead(this, holer);
 		} else {
 			return readBodyBytes(holer);
 		}
+	}
+
+	/**
+	 * 从底层通道读取数据，并返回一个与结果对应的视图 ByteBuffer
+	 * @param bufferHolder
+	 * @return
+	 */
+	public int realReadBytes(BufferHolder bufferHolder) throws IOException {
+		if (byteBuffer.position() >= byteBuffer.limit() && !fill(true)) {
+			bufferHolder.setByteBuffer(null);
+			return -1;
+		}
+		int length = byteBuffer.remaining();
+		if (bufferHolder != null) {
+			bufferHolder.setByteBuffer(byteBuffer.duplicate());
+		}
+		byteBuffer.position(byteBuffer.limit());
+		return length;
 	}
 
 	/**
@@ -235,7 +253,7 @@ public class InputBuffer implements Recyclable, BufferHoler {
 	 * @param holer
 	 * @return
 	 */
-	public int readBodyBytes(BufferHoler holer) throws IOException {
+	public int readBodyBytes(BufferHolder holer) throws IOException {
 		if (byteBuffer.position() >= byteBuffer.limit()) {
 			if (!fill(true)) {
 				holer.setByteBuffer(null);

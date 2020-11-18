@@ -184,7 +184,7 @@ public class HttpProcessor implements Processor, ActionHook{
 				inBuffer.readAndParseBody();
 				break;
 			case READ_BODY:
-				BufferHoler holer = (BufferHoler) param[0];
+				BufferHolder holer = (BufferHolder) param[0];
 				try {
 					inBuffer.readBody(holer);
 				} catch (IOException e) {
