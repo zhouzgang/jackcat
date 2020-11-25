@@ -49,7 +49,7 @@ public class Poller implements Runnable {
                 if (!close) {
                     // 判断是否有准备好的事件
                     hasEvents = hasEvents();
-                    keyCount = selector.select(5000);
+                    keyCount = selector.select(2000);
                 } else {
                     timeout(0, false);
                     selector.close();

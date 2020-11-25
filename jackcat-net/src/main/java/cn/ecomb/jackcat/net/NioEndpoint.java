@@ -84,7 +84,7 @@ public class NioEndpoint {
         Thread acceptorThread = new Thread(acceptor, "acceptor");
         acceptorThread.start();
 
-        logger.info("容器启动，监听端口：", port);
+        logger.info("容器启动，监听端口：{}", port);
     }
 
     /**

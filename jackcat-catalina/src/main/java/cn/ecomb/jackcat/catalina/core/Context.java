@@ -143,7 +143,6 @@ public class Context extends Container {
 
         resource = new WebResource(this);
 
-
         mimeMappings.put("css","text/css");
         mimeMappings.put("exe","application/octet-stream");
         mimeMappings.put("gif","image/gif");

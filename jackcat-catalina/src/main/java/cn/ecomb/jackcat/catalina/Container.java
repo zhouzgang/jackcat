@@ -68,6 +68,7 @@ public abstract class Container extends Lifecycle{
 	/**
 	 * 后台业务处理线程
 	 * 为什么容器实现 Runnable 接口
+	 * // todo 如果是 wrapper 这里好像什么都没干，开了一个线程长轮询
 	 */
 	protected class ContainerBackGroundThread implements Runnable{
 		@Override

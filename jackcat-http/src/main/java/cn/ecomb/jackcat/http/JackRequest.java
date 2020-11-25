@@ -79,7 +79,7 @@ public class JackRequest implements Recyclable, ActionHook{
 		headers.remove(key);
 	}
 
-	public HashMap<String, String> getParam() {
+	public HashMap<String, String> getParams() {
 		if (!paramParsed) {
 			action(ActionCode.PARSE_PARAMS, null);
 		}

@@ -33,6 +33,7 @@ public class Acceptor implements Runnable {
             try {
                 // 申请一个连接名额
                 endpoint.acquireConnSemaphore();
+                // todo 这里是阻塞的吗？
                 SocketChannel socket = endpoint.accept();
                 try {
                     socket.configureBlocking(false);
