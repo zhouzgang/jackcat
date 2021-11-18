@@ -70,4 +70,21 @@ public class JackResponse implements Recyclable, ActionHook{
 		status = 200;
 		message = "";
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Response headers: \r\n");
+		builder.append("HTTP/1.1 ");
+		builder.append(status);
+		builder.append(HttpStatus.getByCode(status).getMsg()).append("\r\n");
+		return builder.toString();
+	}
+
+	public void reset() throws IllegalStateException {
+		if (committed) {
+			throw new IllegalStateException();
+		}
+		recycle();
+	}
 }

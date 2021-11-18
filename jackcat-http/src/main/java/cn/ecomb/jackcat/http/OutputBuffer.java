@@ -33,6 +33,11 @@ public class OutputBuffer implements Recyclable {
 		this.response = response;
 	}
 
+	public void setChannel(NioChannel channel) {
+		this.channel = channel;
+		byteBuffer = channel.getWriteBuff();
+		byteBuffer.clear();
+	}
 
 	/**
 	 * 将响应头写到缓存区

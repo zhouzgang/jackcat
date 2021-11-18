@@ -8,6 +8,10 @@ import cn.ecomb.jackcat.net.Processor;
 import java.io.IOException;
 
 /**
+ * 使用 curl 工具进行测试：
+ * curl  http://127.0.0.1:8089/index?a=2 -X POST -d "user=abc&passwd=创" -v
+ * curl  http://127.0.0.1:8089 -X POST -H "Transfer-Encoding:chunked" -d "user=abc&passwd=创" -v
+ * curl  http://127.0.0.1:8089 -F "" -v
  * @author brian.zhou
  * @date 2020/11/25
  */

@@ -40,7 +40,7 @@ public class AdapterImpl implements Adapter {
 
 		try {
 			if (postParseRequest(jackRequest, request, jackResponse, response)) {
-			connector.getContext().getPipeline().handle(request, response);
+				connector.getContext().getPipeline().handle(request, response);
 			}
 			response.finish();
 		} catch (ServletException e) {

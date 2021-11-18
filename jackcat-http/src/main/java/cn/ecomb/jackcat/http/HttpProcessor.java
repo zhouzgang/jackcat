@@ -64,7 +64,7 @@ public class HttpProcessor implements Processor, ActionHook{
 		// 这是一种什么写法
 		while (!error && keepAlive) {
 			try {
-				if (inBuffer.parseRequestLineAndHeads()) {
+				if (!inBuffer.parseRequestLineAndHeads()) {
 					return Handler.SocketState.LONG;
 				}
 			} catch (IOException e) {
@@ -132,7 +132,7 @@ public class HttpProcessor implements Processor, ActionHook{
 		// todo 检查 expect 头
 
 		boolean contentDelimitation = false;
-		String transferEncoding = request.getHeader("transfer-endcoding");
+		String transferEncoding = request.getHeader("transfer-encoding");
 		if ("chunked".equalsIgnoreCase(transferEncoding)) {
 			contentDelimitation = true;
 			inBuffer.setBodyCodec(new ChunkedCodec());
@@ -229,7 +229,7 @@ public class HttpProcessor implements Processor, ActionHook{
 			}
 			int contentLength = response.getContentLength();
 			if (contentLength != -1) {
-				response.addHeader("Conent-Length", String.valueOf(contentLength));
+				response.addHeader("Content-Length", String.valueOf(contentLength));
 				outBuffer.setBodyCodec(new IdentityCodec(contentLength));
 			} else {
 				response.addHeader("Transfer-Encoding", "chunked");

@@ -68,7 +68,7 @@ public class NioChannel {
         writeBuff.flip();
         // todo 这里应该还没写完
         if (writeBuff.remaining() > 0) {
-            logger.debug("模拟阻塞写数据");
+            logger.debug("模拟阻塞写入 - 将响应体 [{}B] 数据写入通道 [{}]", writeBuff.remaining(), this);
         }
         while (writeBuff.hasRemaining()) {
             int n = socketChannel.write(writeBuff);
@@ -82,7 +82,6 @@ public class NioChannel {
 
             // todo what is here?
             writLatch = new CountDownLatch(1);
-            // todo why do this
             poller.register(this, SelectionKey.OP_WRITE);
             logger.debug("等待阻塞通道 {} 写数据", this);
             try {

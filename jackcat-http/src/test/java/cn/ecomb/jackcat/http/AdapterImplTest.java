@@ -17,6 +17,7 @@ public class AdapterImplTest implements Adapter{
 	public void service(JackRequest jackRequest, JackResponse jackResponse) throws IOException {
 		request = jackRequest;
 		response = jackResponse;
+		// 触发请求体的读取和解析
 		request.getParams().get("none");
 
 		StringBuilder content = new StringBuilder();

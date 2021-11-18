@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * @author zhouzg
  * @date 2020-11-06.
  */
-public class AppIntputBuffer extends ServletInputStream implements BufferHolder {
+public class AppInputBuffer extends ServletInputStream implements BufferHolder {
 
 	private JackRequest jackRequest;
 	private ByteBuffer bodyView;

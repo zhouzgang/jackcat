@@ -35,7 +35,7 @@ public class InputBuffer implements Recyclable, BufferHolder {
 	/**
 	 * 当前解析的状态
 	 */
-	private ParseStatus parseStatus;
+	private ParseStatus parseStatus = ParseStatus.METHOD;
 
 	private boolean parsingHeader = true;
 	private int maxHeaderSize = 8192;
@@ -89,7 +89,7 @@ public class InputBuffer implements Recyclable, BufferHolder {
 	 */
 	public boolean parseRequestLineAndHeads() throws IOException {
 
-		logger.debug("解析请求头和情趣行");
+		logger.debug("解析请求头和请求行");
 		// 这里的处理方式很有意思，通过状态流转的方式，循环读取，并解析
 		// 这里是不是可以一次性循环读取完，再解析会好一点？
 		String headerName = null;
@@ -315,8 +315,15 @@ public class InputBuffer implements Recyclable, BufferHolder {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			request.setParamParseFail(true);
+			e.printStackTrace();
 		}
 
+		// 5. 解析参数
+		body.flip();
+		byte[] post = new byte[body.remaining()];
+		body.get(post);
+		parseParam(post);
 	}
 
 
